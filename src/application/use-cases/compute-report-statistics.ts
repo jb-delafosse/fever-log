@@ -40,6 +40,9 @@ export interface ReportStatistics {
 
   // Recent episodes for timeline
   recentEpisodes: Episode[];
+
+  // Fever days for calendar heatmap (ISO date strings YYYY-MM-DD)
+  feverDays: string[];
 }
 
 /**
@@ -153,6 +156,19 @@ export class ComputeReportStatistics {
       .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
       .slice(0, 5);
 
+    // Compute fever days for calendar heatmap (days with temp >= 38°C)
+    const FEVER_THRESHOLD = 38;
+    const feverDaySet = new Set<string>();
+    for (const event of allEvents) {
+      if (event.type === 'temperature' && event.valueCelsius >= FEVER_THRESHOLD) {
+        // Use local date to avoid timezone issues
+        const d = new Date(event.timestamp);
+        const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        feverDaySet.add(dateKey);
+      }
+    }
+    const feverDays = Array.from(feverDaySet).sort();
+
     return {
       totalEpisodes: episodes.length,
       activeEpisode,
@@ -168,6 +184,7 @@ export class ComputeReportStatistics {
       treatmentEffectiveness,
       totalTreatmentEntries: treatmentEntries.length,
       recentEpisodes,
+      feverDays,
     };
   }
 }
