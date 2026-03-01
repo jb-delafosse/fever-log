@@ -222,4 +222,22 @@
     background-color: #f3f4f6 !important;
     font-weight: bold;
   }
+
+  /* Calendar heatmap print styles */
+  .print-calendar {
+    break-inside: avoid;
+  }
+
+  .print-calendar-cell {
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  .print-calendar-cell-fever {
+    background-color: #dc2626 !important;
+  }
+
+  .print-calendar-cell-empty {
+    background-color: #e5e7eb !important;
+  }
 }
