@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useReportStatistics } from '@/presentation/hooks/use-report-statistics';
 import { PrintableReport } from '@/presentation/components/views/printable-report';
+import { FeverCalendarHeatmap } from '@/presentation/components/views/fever-calendar-heatmap';
 import { getSymptomLabel } from '@/domain/entities/symptom-entry';
 import { getTreatmentLabel, getEffectivenessLabel } from '@/domain/entities/treatment-entry';
 import type { Episode } from '@/domain/entities/episode';
@@ -131,6 +132,22 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
 
+        {/* Fever Calendar Heatmap */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Fever Calendar</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {statistics.feverDays.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No fever days recorded yet
+              </p>
+            ) : (
+              <FeverCalendarHeatmap feverDays={statistics.feverDays} />
+            )}
+          </CardContent>
+        </Card>
+
         {/* Symptom Frequency */}
         <Card>
           <CardHeader className="pb-2">
@@ -231,6 +248,7 @@ export default function ReportsPage() {
             ref={printRef}
             statistics={statistics}
             episodes={statistics.recentEpisodes}
+            feverDays={statistics.feverDays}
           />
         )}
       </div>
