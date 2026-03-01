@@ -6,15 +6,17 @@ import type { ReportStatistics } from '@/application';
 import { getSymptomLabel, getSeverityLabel } from '@/domain/entities/symptom-entry';
 import { getTreatmentLabel, getEffectivenessLabel } from '@/domain/entities/treatment-entry';
 import { getSpecialEventTypeLabel } from '@/domain/entities/special-event';
+import { FeverCalendarHeatmap } from './fever-calendar-heatmap';
 
 interface PrintableReportProps {
   statistics: ReportStatistics;
   episodes: Episode[];
+  feverDays: string[];
   patientName?: string;
 }
 
 export const PrintableReport = forwardRef<HTMLDivElement, PrintableReportProps>(
-  function PrintableReport({ statistics, episodes, patientName }, ref) {
+  function PrintableReport({ statistics, episodes, feverDays, patientName }, ref) {
     const today = new Date().toLocaleDateString('default', {
       year: 'numeric',
       month: 'long',
@@ -63,6 +65,16 @@ export const PrintableReport = forwardRef<HTMLDivElement, PrintableReportProps>(
             </div>
           </div>
         </section>
+
+        {/* Fever Calendar */}
+        {feverDays.length > 0 && (
+          <section className="mb-6 print-avoid-break print-calendar">
+            <h2 className="text-xl font-bold mb-3 border-b border-gray-300 pb-1">
+              Fever Calendar (Last 12 Months)
+            </h2>
+            <FeverCalendarHeatmap feverDays={feverDays} />
+          </section>
+        )}
 
         {/* Symptom Summary */}
         {statistics.symptomFrequencies.length > 0 && (
