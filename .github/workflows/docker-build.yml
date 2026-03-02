@@ -13,12 +13,23 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -50,3 +61,32 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Update version in files
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+
+          # Update package.json version
+          sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
+
+          # Update docker-compose.prod.yml image tag
+          sed -i "s|ghcr.io/jb-delafosse/fever-log:.*|ghcr.io/jb-delafosse/fever-log:$VERSION|" docker-compose.prod.yml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump version to ${{ steps.version.outputs.version }}"
+          title: "chore: bump version to ${{ steps.version.outputs.version }}"
+          body: |
+            Automated version bump triggered by tag `${{ github.ref_name }}`.
+
+            ## Changes
+            - Updated `package.json` version to `${{ steps.version.outputs.version }}`
+            - Updated `docker-compose.prod.yml` image tag to `${{ steps.version.outputs.version }}`
+
+            ## Docker Image
+            Image published to: `ghcr.io/jb-delafosse/fever-log:${{ steps.version.outputs.version }}`
+          branch: chore/bump-version-${{ steps.version.outputs.version }}
+          base: main
+          delete-branch: true
