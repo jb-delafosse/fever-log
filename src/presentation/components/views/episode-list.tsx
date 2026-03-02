@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import type { Episode } from '@/domain/entities/episode';
 import { getSymptomLabel } from '@/domain/entities/symptom-entry';
 import { getTreatmentLabel } from '@/domain/entities/treatment-entry';
@@ -37,9 +38,9 @@ export function EpisodeList({ episodes, activeEpisode, isLoading }: EpisodeListP
     <div className="space-y-6">
       {/* Active Episode */}
       {activeEpisode && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+        <div className="space-y-4">
+          <h2 className="text-base font-medium text-foreground tracking-tight flex items-center gap-2">
+            <span className="w-2 h-2 bg-fever-high rounded-full animate-pulse" />
             Active Episode
           </h2>
           <EpisodeCard episode={activeEpisode} isActive />
@@ -48,8 +49,13 @@ export function EpisodeList({ episodes, activeEpisode, isLoading }: EpisodeListP
 
       {/* Past Episodes */}
       {pastEpisodes.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold">Past Episodes</h2>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-medium text-foreground tracking-tight">Past Episodes</h2>
+            <span className="text-xs text-muted-foreground">
+              {pastEpisodes.length} {pastEpisodes.length === 1 ? 'episode' : 'episodes'}
+            </span>
+          </div>
           <div className="space-y-3">
             {pastEpisodes.map((episode) => (
               <EpisodeCard key={episode.id} episode={episode} />
@@ -108,50 +114,54 @@ function EpisodeCard({ episode, isActive }: EpisodeCardProps) {
   };
 
   return (
-    <Card className={isActive ? 'border-red-300 bg-red-50/50 dark:bg-red-950/20' : ''}>
+    <Card className={cn(
+      "transition-all duration-200",
+      isActive && "border-l-2 border-l-fever-high"
+    )}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium flex items-center justify-between">
-          <span>{formatDateRange(episode.startDate, episode.endDate)}</span>
+        <CardTitle className="text-sm font-medium flex items-center justify-between">
+          <span className="text-foreground">{formatDateRange(episode.startDate, episode.endDate)}</span>
           {isActive && (
-            <span className="text-xs bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-fever-high">
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" />
               Ongoing
             </span>
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-2 text-center">
+        <div className="grid grid-cols-3 gap-3 text-center">
           {/* Duration */}
-          <div className="bg-muted/50 rounded-lg p-2">
-            <p className="text-xs text-muted-foreground">Duration</p>
-            <p className="text-sm font-semibold">{formatDuration(episode.durationHours)}</p>
+          <div className="rounded-lg bg-muted/30 p-2.5">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Duration</p>
+            <p className="text-sm font-semibold mt-0.5">{formatDuration(episode.durationHours)}</p>
           </div>
 
           {/* Max Temp */}
-          <div className="bg-muted/50 rounded-lg p-2">
-            <p className="text-xs text-muted-foreground">Max Temp</p>
-            <p className="text-sm font-semibold text-red-600">
+          <div className="rounded-lg bg-muted/30 p-2.5">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Max Temp</p>
+            <p className="text-sm font-semibold text-fever-high mt-0.5">
               {episode.maxTemperature ? `${episode.maxTemperature.toFixed(1)}°C` : 'N/A'}
             </p>
           </div>
 
           {/* Event Count */}
-          <div className="bg-muted/50 rounded-lg p-2">
-            <p className="text-xs text-muted-foreground">Events</p>
-            <p className="text-sm font-semibold">{episode.events.length}</p>
+          <div className="rounded-lg bg-muted/30 p-2.5">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Events</p>
+            <p className="text-sm font-semibold mt-0.5">{episode.events.length}</p>
           </div>
         </div>
 
         {/* Symptoms */}
         {episode.symptoms.length > 0 && (
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Symptoms</p>
-            <div className="flex flex-wrap gap-1">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">Symptoms</p>
+            <div className="flex flex-wrap gap-1.5">
               {episode.symptoms.map((symptom) => (
                 <span
                   key={symptom}
-                  className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200 px-2 py-0.5 rounded"
+                  className="text-xs px-2 py-0.5 rounded-full bg-symptom-accent/10 text-symptom-accent"
                 >
                   {getSymptomLabel(symptom)}
                 </span>
@@ -163,12 +173,12 @@ function EpisodeCard({ episode, isActive }: EpisodeCardProps) {
         {/* Treatments */}
         {episode.treatments.length > 0 && (
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Treatments</p>
-            <div className="flex flex-wrap gap-1">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">Treatments</p>
+            <div className="flex flex-wrap gap-1.5">
               {episode.treatments.map((treatment) => (
                 <span
                   key={treatment}
-                  className="text-xs bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-200 px-2 py-0.5 rounded"
+                  className="text-xs px-2 py-0.5 rounded-full bg-treatment-accent/10 text-treatment-accent"
                 >
                   {getTreatmentLabel(treatment)}
                 </span>
