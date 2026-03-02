@@ -34,7 +34,7 @@ Fever Log helps parents track their child's PFAPA (Periodic Fever, Aphthous Stom
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/fever-log.git
+git clone https://github.com/jb-delafosse/fever-log.git
 cd fever-log
 
 # 2. Create your .env file
@@ -83,42 +83,77 @@ data/
 
 ### Synology NAS Deployment
 
-1. **SSH into your Synology NAS**
+1. **Enable SSH on Synology**
+   - Go to **Control Panel** > **Terminal & SNMP**
+   - Check **Enable SSH service**
+
+2. **SSH into your Synology NAS**
    ```bash
    ssh admin@your-nas-ip
    ```
 
-2. **Create project directory**
+3. **Create project directory**
    ```bash
-   cd /volume1/docker
-   git clone https://github.com/your-username/fever-log.git
-   cd fever-log
+   sudo mkdir -p /volume1/docker/fever-log
+   cd /volume1/docker/fever-log
    ```
 
-3. **Create configuration**
+4. **Create docker-compose.prod.yml**
    ```bash
-   cp .env.example .env
-   nano .env  # Set AUTH_PASSWORD
+   cat > docker-compose.prod.yml <<'EOF'
+   version: '3.8'
+
+   services:
+     fever-log:
+       image: ghcr.io/jb-delafosse/fever-log:latest
+       container_name: fever-log
+       ports:
+         - "3000:3000"
+       volumes:
+         - ./data:/app/data
+       environment:
+         - NODE_ENV=production
+         - AUTH_PASSWORD=${AUTH_PASSWORD}
+         - DATABASE_PATH=/app/data/fever-log.db
+         - NEXT_TELEMETRY_DISABLED=1
+       restart: unless-stopped
+       healthcheck:
+         test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+         interval: 30s
+         timeout: 10s
+         retries: 3
+         start_period: 40s
+   EOF
+   ```
+
+5. **Create configuration**
+   ```bash
+   echo "AUTH_PASSWORD=your-secure-password-here" > .env
    mkdir -p data
+   sudo chown -R 1001:1001 data
    ```
 
-4. **Set permissions** (important for Synology)
+6. **Pull and start**
    ```bash
-   chown -R 1001:1001 data
+   sudo docker-compose -f docker-compose.prod.yml pull
+   sudo docker-compose -f docker-compose.prod.yml up -d
    ```
 
-5. **Build and start**
-   ```bash
-   docker-compose up -d
-   ```
-
-6. **Access the app**
+7. **Access the app**
    - Open `http://your-nas-ip:3000` in your browser
    - Log in with your AUTH_PASSWORD
 
-7. **Optional: Set up reverse proxy**
+8. **Optional: Set up reverse proxy**
    - Use Synology's built-in reverse proxy (Control Panel > Application Portal > Reverse Proxy)
    - Point your domain to port 3000
+
+### Updating to a New Version
+
+```bash
+cd /volume1/docker/fever-log
+sudo docker-compose -f docker-compose.prod.yml pull
+sudo docker-compose -f docker-compose.prod.yml up -d
+```
 
 ---
 
@@ -224,6 +259,28 @@ npm run build    # Build for production
 npm run start    # Start production server
 npm run lint     # Run ESLint
 ```
+
+### Release Process
+
+To release a new version:
+
+1. **Create and push a tag**
+   ```bash
+   git tag v0.2.0
+   git push origin v0.2.0
+   ```
+
+2. **GitHub Actions automatically**:
+   - Builds the Docker image
+   - Pushes to `ghcr.io/jb-delafosse/fever-log`
+   - Creates a PR to bump version in `package.json` and `docker-compose.prod.yml`
+
+3. **Merge the version bump PR** to keep versions in sync
+
+The Docker image is tagged with:
+- Exact version: `0.2.0`
+- Minor version: `0.2`
+- Latest: `latest`
 
 ### Project Structure
 
