@@ -16,7 +16,7 @@ const FEVER_THRESHOLD = 38;
 /**
  * Gap in hours that signals the end of an episode.
  */
-const EPISODE_GAP_HOURS = 24;
+const EPISODE_GAP_HOURS = 48;
 
 /**
  * Check if a temperature reading indicates fever.
