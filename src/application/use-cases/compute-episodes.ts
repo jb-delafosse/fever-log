@@ -4,7 +4,7 @@ import type { EventRepository } from '@/application/ports/event-repository';
 
 /**
  * Use case for computing episodes from all events.
- * Episodes are computed aggregates based on the 48-hour gap rule.
+ * Episodes are computed aggregates based on the 24-hour gap rule.
  */
 export class ComputeEpisodes {
   constructor(private readonly eventRepository: EventRepository) {}

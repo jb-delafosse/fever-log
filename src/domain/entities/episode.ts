@@ -12,7 +12,7 @@ export type EpisodeEvent = TemperatureReading | SymptomEntry | TreatmentEntry | 
 /**
  * Episode - a computed aggregate of fever-related events.
  * Episodes are not stored directly; they are computed from events
- * using the 48-hour gap rule.
+ * using the 24-hour gap rule.
  */
 export interface Episode {
   /** Unique identifier for the episode (generated from first event) */
@@ -31,7 +31,7 @@ export interface Episode {
   treatments: string[];
   /** Duration of the episode in hours */
   durationHours: number;
-  /** Whether this episode is currently active (no 48h gap yet) */
+  /** Whether this episode is currently active (no 24h gap yet) */
   isActive: boolean;
 }
 
@@ -44,9 +44,9 @@ export function calculateDurationHours(start: Date, end: Date): number {
 }
 
 /**
- * Check if an episode is currently active (last event within 48 hours).
+ * Check if an episode is currently active (last event within 24 hours).
  */
 export function isEpisodeActive(episode: Episode, now: Date = new Date()): boolean {
   const hoursSinceLastEvent = calculateDurationHours(episode.endDate, now);
-  return hoursSinceLastEvent < 48;
+  return hoursSinceLastEvent < 24;
 }

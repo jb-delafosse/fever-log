@@ -14,7 +14,7 @@ const FEVER_THRESHOLD = 38;
 /**
  * Gap in hours that signals the end of an episode.
  */
-const EPISODE_GAP_HOURS = 48;
+const EPISODE_GAP_HOURS = 24;
 
 /**
  * Check if a temperature reading indicates fever.
@@ -59,12 +59,12 @@ function isSpecialEvent(event: EpisodeEvent): event is SpecialEvent {
 }
 
 /**
- * EpisodeGrouper - Groups events into episodes using the 48-hour gap rule.
+ * EpisodeGrouper - Groups events into episodes using the 24-hour gap rule.
  *
  * Rules:
  * 1. An episode starts when an abnormal temperature (>=38°C) is logged
- * 2. Events are grouped into the same episode if there's no 48-hour gap
- * 3. A gap of >48 hours with normal/no readings starts a new episode
+ * 2. Events are grouped into the same episode if there's no 24-hour gap
+ * 3. A gap of >24 hours with normal/no readings starts a new episode
  * 4. Symptoms and treatments are included in the episode they occur during
  */
 export class EpisodeGrouper {
@@ -166,7 +166,7 @@ export class EpisodeGrouper {
     // Calculate duration
     const durationHours = calculateDurationHours(startDate, endDate);
 
-    // Check if episode is active (last event within 48 hours of now)
+    // Check if episode is active (last event within 24 hours of now)
     const now = new Date();
     const hoursSinceLastEvent = calculateDurationHours(endDate, now);
     const isActive = hoursSinceLastEvent < EPISODE_GAP_HOURS;
