@@ -2,7 +2,9 @@ import type { Episode, EpisodeEvent } from '../entities/episode';
 import { calculateDurationHours } from '../entities/episode';
 import type { TemperatureReading } from '../entities/temperature-reading';
 import type { SymptomEntry, SymptomType } from '../entities/symptom-entry';
+import { getSymptomLabel } from '../entities/symptom-entry';
 import type { TreatmentEntry } from '../entities/treatment-entry';
+import { getTreatmentLabel } from '../entities/treatment-entry';
 import type { DoctorVisit } from '../entities/doctor-visit';
 import type { SpecialEvent } from '../entities/special-event';
 
@@ -155,13 +157,29 @@ export class EpisodeGrouper {
       ? Math.max(...temperatureReadings.map((r) => r.valueCelsius))
       : null;
 
-    // Extract unique symptoms
+    // Extract unique symptoms (deduplicate by display label to handle inconsistent storage)
     const symptomEntries = sortedEvents.filter(isSymptomEntry);
-    const symptoms: SymptomType[] = [...new Set(symptomEntries.map((s) => s.symptom))];
+    const seenSymptomLabels = new Set<string>();
+    const symptoms: SymptomType[] = [];
+    for (const entry of symptomEntries) {
+      const label = getSymptomLabel(entry.symptom);
+      if (!seenSymptomLabels.has(label)) {
+        seenSymptomLabels.add(label);
+        symptoms.push(entry.symptom);
+      }
+    }
 
-    // Extract unique treatments
+    // Extract unique treatments (deduplicate by display label to handle inconsistent storage)
     const treatmentEntries = sortedEvents.filter(isTreatmentEntry);
-    const treatments: string[] = [...new Set(treatmentEntries.map((t) => t.treatment))];
+    const seenTreatmentLabels = new Set<string>();
+    const treatments: string[] = [];
+    for (const entry of treatmentEntries) {
+      const label = getTreatmentLabel(entry.treatment);
+      if (!seenTreatmentLabels.has(label)) {
+        seenTreatmentLabels.add(label);
+        treatments.push(entry.treatment);
+      }
+    }
 
     // Calculate duration
     const durationHours = calculateDurationHours(startDate, endDate);
