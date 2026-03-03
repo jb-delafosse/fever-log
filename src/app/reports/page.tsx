@@ -94,6 +94,15 @@ export default function ReportsPage() {
               />
             </div>
 
+            {statistics.averageDaysBetweenEpisodes !== null && (
+              <div className="pt-2 border-t text-center">
+                <p className="text-sm text-muted-foreground">Episode Frequency</p>
+                <p className="text-lg font-semibold mt-1">
+                  Every <span className="text-2xl">{statistics.averageDaysBetweenEpisodes}</span> days on average
+                </p>
+              </div>
+            )}
+
             {statistics.averageDurationHours !== null && (
               <div className="pt-2 border-t">
                 <p className="text-sm text-muted-foreground">Duration Statistics</p>

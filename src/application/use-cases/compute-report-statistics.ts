@@ -22,6 +22,7 @@ export interface ReportStatistics {
   activeEpisode: Episode | null;
   averageDurationHours: number | null;
   maxDurationHours: number | null;
+  averageDaysBetweenEpisodes: number | null;
   episodesLast30Days: number;
   episodesLast90Days: number;
 
@@ -76,6 +77,28 @@ export class ComputeReportStatistics {
       : null;
 
     const maxDurationHours = durations.length > 0 ? Math.max(...durations) : null;
+
+    // Calculate average days between episodes
+    let averageDaysBetweenEpisodes: number | null = null;
+    if (episodes.length >= 2) {
+      // Sort episodes by start date (oldest first)
+      const sortedEpisodes = [...episodes].sort(
+        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
+
+      // Calculate gaps between consecutive episodes
+      const gaps: number[] = [];
+      for (let i = 1; i < sortedEpisodes.length; i++) {
+        const prevEnd = new Date(sortedEpisodes[i - 1].startDate).getTime();
+        const currStart = new Date(sortedEpisodes[i].startDate).getTime();
+        const gapDays = (currStart - prevEnd) / (1000 * 60 * 60 * 24);
+        gaps.push(gapDays);
+      }
+
+      averageDaysBetweenEpisodes = Math.round(
+        gaps.reduce((a, b) => a + b, 0) / gaps.length
+      );
+    }
 
     // Episodes in time periods
     const episodesLast30Days = episodes.filter(
@@ -175,6 +198,7 @@ export class ComputeReportStatistics {
       activeEpisode,
       averageDurationHours,
       maxDurationHours,
+      averageDaysBetweenEpisodes,
       episodesLast30Days,
       episodesLast90Days,
       maxTemperatureEver,
