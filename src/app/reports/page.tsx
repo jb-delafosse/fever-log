@@ -152,6 +152,7 @@ export default function ReportsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Symptom Frequency</CardTitle>
+            <p className="text-xs text-muted-foreground">% of episodes with each symptom</p>
           </CardHeader>
           <CardContent>
             {statistics.symptomFrequencies.length === 0 ? (
@@ -165,7 +166,7 @@ export default function ReportsPage() {
                     <div className="flex justify-between text-sm mb-1">
                       <span>{getSymptomLabel(item.symptom)}</span>
                       <span className="text-muted-foreground">
-                        {item.count} ({item.percentage}%)
+                        {item.count} {item.count === 1 ? 'episode' : 'episodes'} ({item.percentage}%)
                       </span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
