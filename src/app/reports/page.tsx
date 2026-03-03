@@ -97,14 +97,10 @@ export default function ReportsPage() {
             {statistics.averageDurationHours !== null && (
               <div className="pt-2 border-t">
                 <p className="text-sm text-muted-foreground">Duration Statistics</p>
-                <div className="grid grid-cols-3 gap-2 mt-2">
+                <div className="grid grid-cols-2 gap-2 mt-2">
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">Average</p>
                     <p className="font-semibold">{statistics.averageDurationHours}h</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs text-muted-foreground">Shortest</p>
-                    <p className="font-semibold">{statistics.minDurationHours}h</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">Longest</p>
