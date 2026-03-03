@@ -13,7 +13,7 @@ Fever Log helps parents track their child's PFAPA (Periodic Fever, Aphthous Stom
 - **Treatment Tracking**: Record medications and their effectiveness
 - **Doctor Visits**: Document medical appointments and outcomes
 - **Special Events**: Log surgeries, hospitalizations, and other significant events
-- **Episode Detection**: Automatic grouping of events into fever episodes (48-hour gap rule)
+- **Episode Detection**: Automatic grouping of events into fever episodes (24-hour gap rule)
 - **Reports & Analytics**: View statistics, symptom frequency, and treatment effectiveness
 - **Printable Reports**: Generate doctor-friendly reports for medical consultations
 - **Data Export/Import**: Backup and restore your data (JSON/CSV formats)
