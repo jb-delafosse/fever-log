@@ -101,22 +101,25 @@ export class ComputeReportStatistics {
       ? Math.round((maxTemperatures.reduce((a, b) => a + b, 0) / maxTemperatures.length) * 10) / 10
       : null;
 
-    // Symptom frequency
-    const symptomCounts: Record<string, number> = {};
-    for (const entry of symptomEntries) {
-      if (entry.type === 'symptom') {
-        const symptom = entry.symptom;
-        symptomCounts[symptom] = (symptomCounts[symptom] || 0) + 1;
+    // Symptom frequency (based on episodes, not individual log entries)
+    // Count how many episodes contain each symptom
+    const symptomEpisodeCounts: Record<string, number> = {};
+    for (const episode of episodes) {
+      // Use a Set to count each symptom only once per episode
+      const uniqueSymptoms = new Set(episode.symptoms);
+      for (const symptom of uniqueSymptoms) {
+        symptomEpisodeCounts[symptom] = (symptomEpisodeCounts[symptom] || 0) + 1;
       }
     }
 
     const totalSymptomEntries = symptomEntries.length;
-    const symptomFrequencies: SymptomFrequency[] = Object.entries(symptomCounts)
+    const totalEpisodesCount = episodes.length;
+    const symptomFrequencies: SymptomFrequency[] = Object.entries(symptomEpisodeCounts)
       .map(([symptom, count]) => ({
         symptom,
         count,
-        percentage: totalSymptomEntries > 0
-          ? Math.round((count / totalSymptomEntries) * 100)
+        percentage: totalEpisodesCount > 0
+          ? Math.round((count / totalEpisodesCount) * 100)
           : 0,
       }))
       .sort((a, b) => b.count - a.count);
