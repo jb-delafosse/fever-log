@@ -22,7 +22,6 @@ export interface ReportStatistics {
   activeEpisode: Episode | null;
   averageDurationHours: number | null;
   maxDurationHours: number | null;
-  minDurationHours: number | null;
   episodesLast30Days: number;
   episodesLast90Days: number;
 
@@ -77,7 +76,6 @@ export class ComputeReportStatistics {
       : null;
 
     const maxDurationHours = durations.length > 0 ? Math.max(...durations) : null;
-    const minDurationHours = durations.length > 0 ? Math.min(...durations) : null;
 
     // Episodes in time periods
     const episodesLast30Days = episodes.filter(
@@ -177,7 +175,6 @@ export class ComputeReportStatistics {
       activeEpisode,
       averageDurationHours,
       maxDurationHours,
-      minDurationHours,
       episodesLast30Days,
       episodesLast90Days,
       maxTemperatureEver,
