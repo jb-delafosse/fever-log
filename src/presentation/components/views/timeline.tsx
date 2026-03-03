@@ -220,7 +220,7 @@ function TemperatureCard({ reading, displayUnit, onDelete, onEdit }: Temperature
           )}
         </div>
 
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
+        <div className="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 shrink-0">
           <ActionButtons event={reading} onDelete={onDelete} onEdit={onEdit} />
         </div>
       </CardContent>
@@ -273,7 +273,7 @@ function SymptomCard({ entry, onDelete, onEdit }: SymptomCardProps) {
           )}
         </div>
 
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
+        <div className="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 shrink-0">
           <ActionButtons event={entry} onDelete={onDelete} onEdit={onEdit} />
         </div>
       </CardContent>
@@ -332,7 +332,7 @@ function TreatmentCard({ entry, onDelete, onEdit }: TreatmentCardProps) {
           )}
         </div>
 
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
+        <div className="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 shrink-0">
           <ActionButtons event={entry} onDelete={onDelete} onEdit={onEdit} />
         </div>
       </CardContent>
@@ -360,7 +360,7 @@ function DoctorVisitCard({ visit, onDelete, onEdit }: DoctorVisitCardProps) {
               <span className="text-base font-medium text-foreground">
                 Doctor Visit
               </span>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
                 <ActionButtons event={visit} onDelete={onDelete} onEdit={onEdit} />
               </div>
             </div>
@@ -415,7 +415,7 @@ function SpecialEventCard({ event, onDelete, onEdit }: SpecialEventCardProps) {
               <span className="text-base font-medium text-foreground">
                 {getSpecialEventTypeLabel(event.eventType)}
               </span>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
                 <ActionButtons event={event} onDelete={onDelete} onEdit={onEdit} />
               </div>
             </div>
