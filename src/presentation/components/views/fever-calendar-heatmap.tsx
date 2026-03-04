@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface FeverCalendarHeatmapProps {
@@ -21,7 +21,15 @@ interface WeekColumn {
 }
 
 export function FeverCalendarHeatmap({ feverDays, className }: FeverCalendarHeatmapProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const feverDaySet = useMemo(() => new Set(feverDays), [feverDays]);
+
+  // Scroll to the most recent date (right side) on mount
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+    }
+  }, []);
 
   const { weeks, monthLabels } = useMemo(() => {
     const today = new Date();
@@ -90,7 +98,7 @@ export function FeverCalendarHeatmap({ feverDays, className }: FeverCalendarHeat
   const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   return (
-    <div className={cn('overflow-x-auto', className)}>
+    <div ref={scrollContainerRef} className={cn('overflow-x-auto', className)}>
       <div className="inline-block min-w-max">
         {/* Month labels */}
         <div className="flex ml-6 mb-1">
