@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   fever-log:
-    image: ghcr.io/jb-delafosse/fever-log:0.1.4
+    image: ghcr.io/jb-delafosse/fever-log:0.1.5
     container_name: fever-log
     ports:
       - "3000:3000"
