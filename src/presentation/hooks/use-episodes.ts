@@ -28,6 +28,18 @@ export function useEpisodes() {
     refreshEpisodes();
   }, [refreshEpisodes]);
 
+  // Refresh episodes when the page becomes visible (handles PWA background/foreground)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshEpisodes();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [refreshEpisodes]);
+
   // Get the currently active episode (if any)
   const activeEpisode = episodes.find((ep) => ep.isActive) || null;
 
