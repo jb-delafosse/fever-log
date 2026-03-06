@@ -184,10 +184,16 @@ export class EpisodeGrouper {
     // Calculate duration
     const durationHours = calculateDurationHours(startDate, endDate);
 
-    // Check if episode is active (last event within 24 hours of now)
+    // Check if episode is active (last FEVER temperature within gap threshold of now)
+    // Only fever temperatures determine if an episode is ongoing, not other events
+    const feverReadings = temperatureReadings.filter(isFeverTemperature);
+    const lastFeverTime = feverReadings.length > 0
+      ? new Date(Math.max(...feverReadings.map((r) => new Date(r.timestamp).getTime())))
+      : null;
+
     const now = new Date();
-    const hoursSinceLastEvent = calculateDurationHours(endDate, now);
-    const isActive = hoursSinceLastEvent < EPISODE_GAP_HOURS;
+    const isActive = lastFeverTime !== null &&
+      calculateDurationHours(lastFeverTime, now) < EPISODE_GAP_HOURS;
 
     // Generate ID from first event
     const id = `episode-${sortedEvents[0].id}`;
