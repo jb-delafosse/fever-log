@@ -100,11 +100,24 @@ export class EpisodeGrouper {
         const gapHours = calculateDurationHours(lastFeverTime, eventTime);
 
         if (gapHours >= EPISODE_GAP_HOURS) {
-          // Gap detected - finalize current episode if it exists
-          if (currentEpisode.length > 0 && episodeStarted) {
-            episodes.push(this.createEpisode(currentEpisode));
+          // Gap detected - split events at the cutoff time
+          const cutoffTime = new Date(lastFeverTime.getTime() + EPISODE_GAP_HOURS * 60 * 60 * 1000);
+
+          // Events before cutoff go to current episode
+          const eventsForCurrentEpisode = currentEpisode.filter(
+            (e) => new Date(e.timestamp).getTime() <= cutoffTime.getTime()
+          );
+
+          // Events after cutoff go to next episode
+          const eventsForNextEpisode = currentEpisode.filter(
+            (e) => new Date(e.timestamp).getTime() > cutoffTime.getTime()
+          );
+
+          if (eventsForCurrentEpisode.length > 0 && episodeStarted) {
+            episodes.push(this.createEpisode(eventsForCurrentEpisode));
           }
-          currentEpisode = [];
+
+          currentEpisode = eventsForNextEpisode;
           episodeStarted = false;
         }
       }
