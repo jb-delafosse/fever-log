@@ -16,7 +16,7 @@ const FEVER_THRESHOLD = 38;
 /**
  * Gap in hours that signals the end of an episode.
  */
-const EPISODE_GAP_HOURS = 48;
+export const EPISODE_GAP_HOURS = 48;
 
 /**
  * Check if a temperature reading indicates fever.
@@ -100,7 +100,7 @@ export class EpisodeGrouper {
         const gapHours = calculateDurationHours(lastFeverTime, eventTime);
 
         if (gapHours >= EPISODE_GAP_HOURS) {
-          // Gap detected - split events at the cutoff time
+          // Gap detected - finalize current episode with events up to cutoff
           const cutoffTime = new Date(lastFeverTime.getTime() + EPISODE_GAP_HOURS * 60 * 60 * 1000);
 
           // Events before cutoff go to current episode
@@ -108,16 +108,12 @@ export class EpisodeGrouper {
             (e) => new Date(e.timestamp).getTime() <= cutoffTime.getTime()
           );
 
-          // Events after cutoff go to next episode
-          const eventsForNextEpisode = currentEpisode.filter(
-            (e) => new Date(e.timestamp).getTime() > cutoffTime.getTime()
-          );
-
           if (eventsForCurrentEpisode.length > 0 && episodeStarted) {
             episodes.push(this.createEpisode(eventsForCurrentEpisode));
           }
 
-          currentEpisode = eventsForNextEpisode;
+          // Discard events after cutoff - they don't belong to any episode
+          currentEpisode = [];
           episodeStarted = false;
         }
       }
@@ -128,16 +124,9 @@ export class EpisodeGrouper {
         lastFeverTime = eventTime;
       }
 
-      // Add event to current episode if episode has started
-      // or if it's a symptom/treatment/doctor visit/special event that might be related
+      // Only add event to current episode if episode has started (fever detected)
+      // Events before fever or after cutoff are not assigned to any episode
       if (episodeStarted) {
-        currentEpisode.push(event);
-      } else if (isSymptomEntry(event) || isTreatmentEntry(event) || isDoctorVisit(event) || isSpecialEvent(event)) {
-        // Include symptoms/treatments/doctor visits/special events even before fever is detected
-        // They might be early warning signs or related to an upcoming episode
-        currentEpisode.push(event);
-      } else if (isTemperatureReading(event)) {
-        // Normal temperature reading - include it for context
         currentEpisode.push(event);
       }
     }
