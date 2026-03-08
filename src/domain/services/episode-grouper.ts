@@ -89,14 +89,15 @@ export class EpisodeGrouper {
     const episodes: Episode[] = [];
     let currentEpisode: EpisodeEvent[] = [];
     let episodeStarted = false;
-    let lastEventTime: Date | null = null;
+    let lastFeverTime: Date | null = null;
 
     for (const event of sortedEvents) {
       const eventTime = new Date(event.timestamp);
+      const isFever = isTemperatureReading(event) && isFeverTemperature(event);
 
-      // Check if we need to start a new episode due to gap
-      if (lastEventTime) {
-        const gapHours = calculateDurationHours(lastEventTime, eventTime);
+      // Check if we need to start a new episode due to gap (based on FEVER temps only)
+      if (isFever && lastFeverTime) {
+        const gapHours = calculateDurationHours(lastFeverTime, eventTime);
 
         if (gapHours >= EPISODE_GAP_HOURS) {
           // Gap detected - finalize current episode if it exists
@@ -109,8 +110,9 @@ export class EpisodeGrouper {
       }
 
       // Check if this event starts an episode (fever temperature)
-      if (isTemperatureReading(event) && isFeverTemperature(event)) {
+      if (isFever) {
         episodeStarted = true;
+        lastFeverTime = eventTime;
       }
 
       // Add event to current episode if episode has started
@@ -125,8 +127,6 @@ export class EpisodeGrouper {
         // Normal temperature reading - include it for context
         currentEpisode.push(event);
       }
-
-      lastEventTime = eventTime;
     }
 
     // Finalize the last episode
